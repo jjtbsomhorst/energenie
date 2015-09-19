@@ -52,20 +52,33 @@ c.controller('AuthController',['$scope','$location','authService',function($scop
 	$scope.currentPage = 0;
 	$scope.pageSize = 10;
 	$scope.entrycount = 0;
+	$scope.pageCount = 0;
+	$scope.disableNext = false;
+	$scope.disablePrevious = true;
 	
 	$scope.$watch('currentPage',function(n,o){
 		if(n != null & !(n < 0)){
 			service.list($rp.type,$scope.currentPage,$scope.pageSize).then(function(data){
 				$scope.entries = data.data.entries.reverse();
 				$scope.entrycount = parseInt(data.data.records);
+				var mod = $scope.entrycount % $scope.pageSize;
+				$scope.pageCount = ($scope.entrycount - mod )/$scope.pageSize;
+				if(mod > 0 ){
+					$scope.pageCount++;
+				}
+				
+				
+				
 			},function(data){
 				console.log('kapot');
 			})
 		}
 	});
 	
+	
+	
 	$scope.gotoPrevious = function(){
-		if($scope.currentPage >= 0){
+		if($scope.currentPage > -1){
 			$scope.currentPage = $scope.currentPage-1;
 		}
 	}
