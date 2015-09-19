@@ -1,0 +1,17 @@
+<div layout="row">
+	<md-input-container>
+		<label>Wachtwoord</label>
+		<input type="password" ng-model="user.password"/>
+	</md-input-container>
+	</div>
+<div layout="row">
+	<md-input-container>
+		<label>Invoer datum</label>
+		<input ng-model="preference.enterdayofmonth"/>
+	</md-input-container>
+</div>
+<div layout="row">
+	<md-checkbox ng-model="preference.notify" aria-label="Notificatie" ng-click="saveNotification()">
+		Notificatie instellen
+	</md-checkbox>
+</div>
