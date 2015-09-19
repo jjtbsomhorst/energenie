@@ -13,7 +13,7 @@ class userManager {
 		$userid = $this->getUserByToken($token);
 		if($userid != null){
 			$conn = $this->db->getConn();
-			$stmt = $conn->prepare('SELECT key,value FROM `profilesettings` WHERE user_id = :u');
+			$stmt = $conn->prepare('SELECT label,value FROM `profilesettings` WHERE user_id = :u');
 			$stmt->bindParam(':u',$userid);
 			if($stmt->execute()){
 				return $stmt -> fetchAll(PDO::FETCH_ASSOC);
@@ -30,7 +30,7 @@ class userManager {
 		
 		if(count($setting) > 0 ){
 			$conn = $this->db->getConn();
-			$stmt = $conn->prepare('INSERT INTO profilesettings (`user_id`,`key`,`value`) values(:u,:k,:v)');
+			$stmt = $conn->prepare('INSERT INTO profilesettings (`user_id`,`label`,`value`) values(:u,:k,:v)');
 			$stmt->bindParam(':u',$userid);
 			$stmt->bindParam(':k',$setting['name']);
 			$stmt->bindParam(':v',$setting['value']);
@@ -43,7 +43,7 @@ class userManager {
 		$userid = $this->getUserByToken($token);
 		if($userid != null && count($setting) > 0){
 			$conn = $this->db->getConn();
-			$stmt = $conn->prepare('UPDATE `profilesettings` SET value = :v WHERE user_id = :u and `key`= :k');
+			$stmt = $conn->prepare('UPDATE `profilesettings` SET value = :v WHERE user_id = :u and `label`= :k');
 			$stmt->bindParam(':v',$setting['value']);
 			$stmt->bindParam(':k',$setting['name']);
 			$stmt->bindParam(':u',$userid);
@@ -56,7 +56,7 @@ class userManager {
 		$user = $this->getUserByToken($token);
 		
 		$conn = $this->db->getConn();
-		$stmt= $conn->prepare('SELECT * FROM `profilesettings` WHERE user_id = :u AND profilesettings.key = :k');
+		$stmt= $conn->prepare('SELECT * FROM `profilesettings` WHERE user_id = :u AND label = :k');
 		$stmt->bindParam(':u',$user);
 		$stmt->bindParam(':k',$setting['name']);
 		
@@ -124,10 +124,26 @@ class userManager {
 		return $this -> db -> createAccount($username, $hash, $salt);
 	}
 
+	function setPassword($token,$password){
+		$user = $this->getUserByToken($token);
+		if($user!=null){
+			$conn = $this->db->getConn();
+			$stmt = $conn->prepare('select username from `user` where user_id = :u');
+			$stmt->bindParam(':u',$user);
+			if($stmt->execute()){
+				$row = $stmt->fetch(PDO::FETCH_ASSOC);
+				return $this->updateCredentials($row['username'],$password);
+			}
+		}
+		return false;
+	}
+	
 	function updateCredentials($username, $password) {
-		$credentials = $this->db -> getCredentials($username);
-		$credentials -> salt = $this -> generateRandomSalt();
-		$credentials -> hash = password_hash($credentials -> salt . ":" . $credentials -> password, PASSWORD_BCRYPT, array('salt' => self::mastersalt));
+
+		$credentials = $this->db->getCredentials($username);
+		$credentials->salt = $this -> generateRandomSalt();
+		$credentials->password = $password;
+		$credentials->hash = password_hash($credentials -> salt . ":" . $credentials -> password, PASSWORD_BCRYPT, array('salt' => self::mastersalt));
 
 		return $this->db -> updateAccount($username, $credentials -> hash, $credentials -> salt);
 	}

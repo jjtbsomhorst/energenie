@@ -3,7 +3,7 @@ var app = angular.module('StarterApp', ['ngMaterial', 'ngRoute','appcontrollers'
 app.config(['$routeProvider',
 function($routeProvider) {
 	$routeProvider.when('/list/:type', {
-		templateUrl : 'partials/gridview.html',
+		templateUrl : 'partials/overview.html',
 		controller : 'listController'
 	}).when('/graph/:type', {
 		templateUrl : 'partials/graphview.html',

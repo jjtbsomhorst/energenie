@@ -78,24 +78,37 @@ c.controller('AuthController',['$scope','$location','authService',function($scop
 		$location.path('/login');
 	}
 }]).controller('profileController',['$scope','authService','$location',function($scope,auth,$location){
+	
+	$scope.dirtypassword = false;
+	
 	if(!auth.isLoggedIn()){
 		$location.path('/login');
 		return;
 	}else{
 		$scope.preference = {};
-		auth.getSettings().then(function(data){
-			
+		auth.profile().then(function(data){
+			for(var i  = 0;i<data.data.length;i++){
+				var entry = data.data[i];
+				$scope.preference[entry.label]=entry.value;
+			}
 		},function(data){
-			console.log('error');
+			$location.path('/login');
 		})
 	}
 	
 	$scope.savePassword= function(){
+		debugger
 		if($scope.hasOwnProperty('password') && $scope.password != null && $scope.password!=""){
 			auth.setPassword($scope.password);
 		}
 	}
-	$scope.$watch('preference.enterdayofmonth',function(n,o){
+	$scope.$watch('password',function(n,o){
+		$scope.dirtypassword=false;
+		if(n!=null && n != o && n != ""){
+			$scope.dirtypassword = true;
+		}
+	})
+	$scope.$watch('preference.recorddate',function(n,o){
 		if(n != o && n != null){
 			auth.updateSetting('recorddate',n).then(function(data){
 			console.log('Setting succesfully updated');
@@ -114,5 +127,20 @@ c.controller('AuthController',['$scope','$location','authService',function($scop
 		})
 		}
 	});	
+	
+	$scope.$watch('preference.email',function(n,o){
+		if(n!=0&& n!=null && n != ""){
+			
+			var re = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+            if(re.test(n)){
+            	
+            	auth.updateSetting('email',n).then(function(data){
+    				
+    			},function(data){
+    				
+    			});
+            }
+		}
+	});
 
 }]);

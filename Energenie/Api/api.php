@@ -11,6 +11,10 @@ $dbManager = new databaseManager();
 $usermanager = new userManager($dbManager);
 $measureService=  new MeasureService($dbManager);
 
+$app->get('/notify',function()use($app,$dbManager,$usermanager){
+	
+});
+
 $app->get('/auth/:token',function($token)use($app,$dbManager,$usermanager){
 	if($token != null && $token != ""){
 		if($usermanager->validateToken($token)){
@@ -97,6 +101,21 @@ $app->post('/account/settings',function() use($app,$usermanager,$dbManager){
 	}
 	$app->response->setStatus(403);
 });
+
+
+$app->put('/account/password',function()use($app,$usermanager){
+	$token = $app->request->headers->get('X-AUTH-TOKEN');
+	if( $usermanager->validateToken($token)){
+		$arrBody = json_decode($app->request->getBody(),true);
+		
+		if($usermanager->setPassword($token,$arrBody['password'])){
+			$app->response->setStatus(202);
+		}else{
+			$app->response->setStatus(500);
+		}
+	}
+});
+
 
 $app->put('/account',function()use($app,$usermanager,$dbManager){
 	if($usermanager->validateToken($app->request->headers->get('X-AUTH-TOKEN')))
