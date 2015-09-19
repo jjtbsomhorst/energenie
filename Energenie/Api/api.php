@@ -166,8 +166,9 @@ $app->map('/:type',function() use ($app, $usermanager,$measureService,$dbManager
 	$app->response->setStatus(201);
 	switch($app->request->getMethod()){
 		case "GET":
-			
-			$app->response->write(json_encode($measureService->getList($userid,$type)));
+			$page = intval($app->request->params('offset'));
+			$pageSize = intval($app->request->params('pageSize'));
+			$app->response->write(json_encode($measureService->getList($userid,$type,$page,$pageSize)));
 			
 			return ;
 		case "POST":

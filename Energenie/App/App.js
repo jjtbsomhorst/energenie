@@ -3,7 +3,7 @@ var app = angular.module('StarterApp', ['ngMaterial', 'ngRoute','appcontrollers'
 app.config(['$routeProvider',
 function($routeProvider) {
 	$routeProvider.when('/list/:type', {
-		templateUrl : 'partials/overview.html',
+		templateUrl : 'partials/overviewcards.html',
 		controller : 'listController'
 	}).when('/graph/:type', {
 		templateUrl : 'partials/graphview.html',
@@ -15,7 +15,11 @@ function($routeProvider) {
 		templateUrl : 'partials/auth.html',
 		controller : 'AuthController'
 	});
-}]);
+}]).config(function($mdThemingProvider) {
+	  $mdThemingProvider.theme('default')
+	    .primaryPalette('pink')
+	    .accentPalette('orange');
+	});;
 
 
 

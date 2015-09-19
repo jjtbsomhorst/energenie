@@ -21,32 +21,57 @@ class MeasureService {
 		if (!is_numeric($type)) {
 			throw new Exception("Type is not recognized");
 		}
-
+		
 		$list = array();
-		$stmt = $this -> db -> getConn() -> prepare("SELECT * from `measurement` where type = :t and user_id = :u order by date ASC LIMIT :o , :l");
+		//$offset = $limit*10;
+		
+		$stmCount = $this -> db -> getConn()->prepare("SELECT COUNT(*) as c from `measurement` where type=:t and user_id=:u");
+		$stmCount->bindParam(':t',$type);
+		$stmCount->bindParam(':u',$user);
+		$entryCount = $limit;
+		
+		if($stmCount->execute()){
+			$row = $stmCount->fetch(PDO::FETCH_ASSOC);
+			$entryCount = $row['c'];
+		}
+		$qLimit = $limit;
+		if($entryCount > $qLimit){
+			$qLimit = $limit+1;
+		}
+				
+		$stmt = $this -> db -> getConn() -> prepare("SELECT * from `measurement` where type = :t and user_id = :u order by date desc LIMIT :o , :l");
 		$stmt -> bindParam(":t", $type);
 		$stmt -> bindParam(":o", $offset, PDO::PARAM_INT);
-		$stmt -> bindParam(":l", $limit, PDO::PARAM_INT);
+		$stmt -> bindParam(":l", $qLimit, PDO::PARAM_INT);
 		$stmt -> bindParam(":u", $user);
 
 		if ($stmt -> execute()) {
-
+		
 			$lst = $stmt -> fetchAll(PDO::FETCH_OBJ);
+						
 			$index = 0;
-			$entries = array();
+			$entries = array($limit);
 			foreach ($lst as $entry) {
 
 				$row = new Measurement($entry);
-
-				if ($index > 0) {
-					$prevEntry = $lst[$index - 1];
-					$row -> difference = ($entry -> amount - $prevEntry -> amount);
+				if($index +1 < count($lst)){
+					$nxtEntry = $lst[$index + 1];
+					$row -> difference = ($entry -> amount - $nxtEntry -> amount);
 				}
-				$entries[$index] = $row -> asArray();
+				
+				if($index < $limit){
+					$entries[$index] = $row -> asArray();
+				}
+				
 				$index++;
 			}
-
-			return $entries;
+			
+			$records = array_reverse($entries);
+			$returnData = array();
+			$returnData['entries'] = $records;
+			$returnData['records'] = $entryCount;
+		
+			return $returnData;
 		}
 	}
 

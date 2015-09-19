@@ -188,11 +188,11 @@ services.factory('energyService', [ '$http', '$q', 'authService',
 
 			service.remove = function(id) {
 			}
-			service.list = function(type) {
+			service.list = function(type,page,pagesize) {
 				this.setType(type);
 				var request = {
 					method : 'GET',
-					url : this.url,
+					url : this.url+"?offset="+page+"&pageSize="+pagesize,
 					headers : {
 						'X-AUTH-TOKEN' : auth.getToken()
 					}

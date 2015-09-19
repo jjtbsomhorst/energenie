@@ -47,25 +47,74 @@ c.controller('AuthController',['$scope','$location','authService',function($scop
   ];
   
  
-}]).controller('listController',['$scope','authService','$routeParams','$location','energyService',function($scope,$auth,$rp,$location,service){
+}]).controller('listController',['$scope','$mdSidenav','authService','$routeParams','$location','energyService',function($scope,$mdSidenav,$auth,$rp,$location,service){
 	
+	$scope.currentPage = 0;
+	$scope.pageSize = 10;
+	$scope.entrycount = 0;
 	
+	$scope.$watch('currentPage',function(n,o){
+		if(n != null & !(n < 0)){
+			service.list($rp.type,$scope.currentPage,$scope.pageSize).then(function(data){
+				$scope.entries = data.data.entries.reverse();
+				$scope.entrycount = parseInt(data.data.records);
+			},function(data){
+				console.log('kapot');
+			})
+		}
+	});
+	
+	$scope.gotoPrevious = function(){
+		if($scope.currentPage >= 0){
+			$scope.currentPage = $scope.currentPage-1;
+		}
+	}
+	$scope.gotoNext = function(){
+		var nxtOffset = ($scope.currentPage) * $scope.pageSize;
+		if($scope.entrycount > nxtOffset){
+			$scope.currentPage = $scope.currentPage+1;
+		}
+	}
 	
 	if(!$auth.isLoggedIn()){
 		$location.path('/login');
 		return;
 	}
-	service.list($rp.type).then(function(data){
-			$scope.entries = data.data.reverse();
+	
+	if($mdSidenav('left').isOpen()){
+		$mdSidenav('left').close();
+	}
+	
+	service.list($rp.type,$scope.currentPage,$scope.pageSize).then(function(data){
+			$scope.entries = data.data.entries.reverse();
+			$scope.entrycount = parseInt(data.data.records);
 		},function(data){
 			console.log('kapot');
 		})
 		
 		
 	$scope.saveRecord = function(){
-		
-		var r = $scope.record;
-		service.add(r.date,r.value).then(function(data){
+
+		var r = $scope.record;		
+		var dayOfMonth = r.date.getDate();
+		var month = r.date.getMonth()+1;
+		var year = r.date.getFullYear();
+		var dtString = "";
+		dtString += year;
+		dtString += "-";
+		if(month < 10){
+			dtString+= "0"+month;
+		}else{
+			dtString+= month;
+		}
+		dtString += "-";
+		if(dayOfMonth <10){
+			dtString += "0"+dayOfMonth;
+		}else{
+			dtString += dayOfMonth;
+		}
+				
+		service.add(dtString,r.value).then(function(data){
 			$scope.entries = data.data.reverse();
 		},function(data){
 			console.log('kapot');
@@ -73,31 +122,36 @@ c.controller('AuthController',['$scope','$location','authService',function($scop
 	}
 	
 	
-}]).controller('graphController',['$scope','authService','$routeParams','$location',function($scope,$auth,$rp,$location){
+}]).controller('graphController',['$scope','$mdSidenav','authService','$routeParams','$location',function($scope,$mdSidenav,$auth,$rp,$location){
 	if(!auth.isLoggedIn()){
 		$location.path('/login');
 	}
-}]).controller('profileController',['$scope','authService','$location',function($scope,auth,$location){
+}]).controller('profileController',['$scope','$mdSidenav','authService','$location',function($scope,$mdSidenav,auth,$location){
 	
 	$scope.dirtypassword = false;
 	
 	if(!auth.isLoggedIn()){
 		$location.path('/login');
 		return;
-	}else{
-		$scope.preference = {};
-		auth.profile().then(function(data){
-			for(var i  = 0;i<data.data.length;i++){
-				var entry = data.data[i];
-				$scope.preference[entry.label]=entry.value;
-			}
-		},function(data){
-			$location.path('/login');
-		})
 	}
 	
+	if($mdSidenav('left').isOpen()){
+		$mdSidenav('left').close();
+	}
+	
+	
+	$scope.preference = {};
+	auth.profile().then(function(data){
+		for(var i  = 0;i<data.data.length;i++){
+			var entry = data.data[i];
+			$scope.preference[entry.label]=entry.value;
+		}
+	},function(data){
+		$location.path('/login');
+	})
+	
+	
 	$scope.savePassword= function(){
-		debugger
 		if($scope.hasOwnProperty('password') && $scope.password != null && $scope.password!=""){
 			auth.setPassword($scope.password);
 		}
