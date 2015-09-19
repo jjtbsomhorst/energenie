@@ -1,0 +1,19 @@
+<div layout="row" layout-wrap>
+	<div flex>
+		<md-button ng-click="saveRecord(record)"> Opslaan </md-button>
+	</div>
+	<md-input-container style="width: 70%"> <label>Waarde</label>
+	<input type="number" ng-model="record.value" required /> </md-input-container>
+	<md-datepicker ng-model="record.date" md-placeholder="Opname datum"></md-datepicker>
+	<input type="hidden" ng-model="record.id" />
+	</div>
+
+<div layout="row">
+	<label class="table-header" flex="33">Datum</label> <label
+		class="table-header" flex="33">Stand</label> <label
+		class="table-header" flex="33">Verbruik</label>
+</div>
+<div layout="row" ng-repeat="record in entries">
+	<label flex="33">{{record.date | date: "MM/dd/yyyy"}}</label> <label
+		flex="33">{{record.amount}}</label> <label flex="33">{{record.difference}}</label>
+</div>
