@@ -1,66 +1,38 @@
-<md-card>
-	<md-card-content>
-		<div layout="row">
-			<md-datepicker ng-model="record.date" md-placeholder="Opname datum" flex-gt-sm="20"></md-datepicker>
-			<md-input-container hide-sm flex-gt-sm="60">
-				<label>Waarde</label>
-				<input type="number" ng-model="record.value" required />
-			</md-input-container>
-		</div>			
-		<div layout="row" hide-gt-sm>
-			<md-input-container>
-				<label>Waarde</label>
-				<input type="number" ng-model="record.value" required />
-			</md-input-container>
-		</div>
-	</md-card-content>
-	<div class="md-actions" layout="row" layout-align="end-center">
-		<md-button class="md-raised md-primary" ng-click="saveRecord(record)">Opslaan</md-button>
-	</div>
+<md-card> <md-card-content>
+<div layout="row">
+	<md-datepicker ng-model="record.date" md-placeholder="Opname datum"
+		flex-gt-sm="20"></md-datepicker>
+	<md-input-container hide-sm flex-gt-sm="60"> <label>Waarde</label>
+	<input type="number" ng-model="record.value" required /> </md-input-container>
+</div>
+<div layout="row" hide-gt-sm>
+	<md-input-container> <label>Waarde</label> <input
+		type="number" ng-model="record.value" required /> </md-input-container>
+</div>
+</md-card-content>
+<div class="md-actions" layout="row" layout-align="end-center">
+	<md-button class="md-raised md-primary" ng-click="saveRecord(record)">Opslaan</md-button>
+</div>
 </md-card>
 
 <div layout="row">
-	<md-card flex-gt-sm="33" flex-sm="100">
-	<md-card-content>
-		<div layout="column">
-			<div layout="row">
-				<label class="table-header" flex="33">Datum</label> <label
-					class="table-header" flex="33">Stand</label> <label
-					class="table-header" flex="33">Verbruik</label>
-			</div>
-			<div layout="row" ng-repeat="record in entries">
-				<label flex="33">{{record.date | date:'dd-MM-yyyy'}}</label> <label
-					flex="33">{{record.amount}}</label> <label flex="33">{{record.difference}}</label>
-			</div>
+	<md-card flex-gt-sm="30" flex-sm="100"> <md-card-content>
+	<div layout="column">
+		<div layout="row">
+			<label class="table-header" flex="33">Datum</label> <label
+				class="table-header" flex="33">Stand</label> <label
+				class="table-header" flex="33">Verbruik</label>
 		</div>
+		<div layout="row" ng-repeat="record in entries">
+			<label flex="33">{{record.date | date:'dd-MM-yyyy'}}</label> <label
+				flex="33">{{record.amount}}</label> <label flex="33">{{record.difference}}</label>
+		</div>
+	</div>
 	</md-card-content>
 	<div class="md-actions" layout="row" layout-align="end-center">
-		<md-button ng-click="gotoPrevious()">Next</md-button>
 		<md-button ng-click="gotoNext()">Previous</md-button>
-		
+		<md-button ng-click="gotoPrevious()">Next</md-button>
 	</div>
-</md-card>
-
-<md-card flex="33" hide-sm>
-	<md-card-content>
-		<div layout="column">
-			<div layout="row">
-				<label class="table-header" flex="33">Datum</label> <label
-					class="table-header" flex="33">Stand</label> <label
-					class="table-header" flex="33">Verbruik</label>
-			</div>
-			<div layout="row" ng-repeat="record in entries">
-				<label flex="33">{{record.date | date: "MM/dd/yyyy"}}</label> <label
-					flex="33">{{record.amount}}</label> <label flex="33">{{record.difference}}</label>
-			</div>
-		</div>
-	</md-card-content>
-	<div class="md-actions" layout="row" layout-align="end-center">
-		<md-button>prev</md-button>
-		<md-button>next</md-button>
-	</div>
-</md-card>
-
-
+	</md-card>
 </div>
 

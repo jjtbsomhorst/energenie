@@ -2,6 +2,8 @@ var TYPE_ELECTRA = "electra";
 var TYPE_WATER = "water";
 var TYPE_GAS = "gas";
 
+var TYPES = [TYPE_ELECTRA,TYPE_GAS,TYPE_WATER];
+
 var services = angular.module('EnergyServices', [ 'ngRoute' ]);
 services.factory('authService', [ '$rootScope', '$http', '$location', '$q',
 		function($scope, $http, $location, $q) {
@@ -130,6 +132,7 @@ services.factory('energyService', [ '$http', '$q', 'authService',
 				electra : [],
 				gas : []
 			};
+			service.types = [TYPE_ELECTRA,TYPE_GAS,TYPE_WATER];
 
 			service.getBaseUrl = function() {
 				return baseUrl;
@@ -188,11 +191,21 @@ services.factory('energyService', [ '$http', '$q', 'authService',
 
 			service.remove = function(id) {
 			}
-			service.list = function(type,page,pagesize) {
+			
+			
+			
+			service.list = function(type,page,pagesize,groupby) {
 				this.setType(type);
+				var url =  this.url+"?offset="+page+"&pageSize="+pagesize;
+				if(groupby != null){
+					url += "&groupBy="+groupby; 
+				}
+				
+				
+				
 				var request = {
 					method : 'GET',
-					url : this.url+"?offset="+page+"&pageSize="+pagesize,
+					url : url,
 					headers : {
 						'X-AUTH-TOKEN' : auth.getToken()
 					}
@@ -201,8 +214,8 @@ services.factory('energyService', [ '$http', '$q', 'authService',
 
 				$http(request).then(function(data) {
 					def.resolve(data);
-				}, function() {
-					console.log('error');
+				}, function(data) {
+					def.reject(data);
 				});
 
 				return def.promise;

@@ -10,6 +10,7 @@ $app = new \Slim\Slim();
 $dbManager = new databaseManager();
 $usermanager = new userManager($dbManager);
 $measureService=  new MeasureService($dbManager);
+$app->response->headers->set('Content-Type', 'application/json');
 
 $app->get('/notify',function()use($app,$dbManager,$usermanager){
 	
@@ -168,7 +169,20 @@ $app->map('/:type',function() use ($app, $usermanager,$measureService,$dbManager
 		case "GET":
 			$page = intval($app->request->params('offset'));
 			$pageSize = intval($app->request->params('pageSize'));
-			$app->response->write(json_encode($measureService->getList($userid,$type,$page,$pageSize)));
+			$groupBy = $app->request->params('groupBy');
+			
+			$data = array();
+			
+			switch($groupBy){
+				case 'year':
+					$data = $measureService->getListByYear($userid,$type);
+					break;
+				default:
+					$data = $measureService->getList($userid,$type,$page,$pageSize);
+					
+			}
+			
+			$app->response->write(json_encode($data));
 			
 			return ;
 		case "POST":

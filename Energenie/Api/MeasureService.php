@@ -12,11 +12,42 @@ class MeasureService {
 	function MeasureService($db) {
 		$this -> db = $db;
 	}
-
-	function handleRequest(){
-		die(print_r($app));
+	
+	function getListByYear($user,$type = 1){
+		$list = array();
+		$conn = $this->db->getConn();
+		
+		$queryString = 'SELECT type,user_id, min(amount) as `mn`, max(amount) as `mx`, year(date) as `year`';
+		$queryString.= ' from `measurement`';
+		$queryString.= ' where type = :t and user_id =:u';
+		$queryString.= ' group by year(`measurement`.`date`)';
+		$queryString.= ' order by year(`measurement`.`date`) asc';
+		
+		$stmt = $conn->prepare($queryString);
+		$stmt->bindParam(':u',$user);
+		$stmt->bindParam(':t',$type);
+		if($stmt->execute()){
+			$lst = $stmt->fetchAll(PDO::FETCH_ASSOC);
+			$entries = array();
+			for($i = 0; $i < count($lst);$i++){
+				$entry = $lst[$i];
+				
+				$entries[$i]['year'] = (int) $entry['year'];
+				$entries[$i]['type'] = $type;
+				$entries[$i]['user'] = $user;
+				$j =$i+1;
+				if(count($lst) == $j){
+					$entries[$i]['amount'] = $entry['mx'] - $entry['mn'];
+				}else{
+					$nxtEntry = $lst[$j];
+					$entries[$i]['amount'] = $nxtEntry['mn'] - $entry['mn'];
+				}
+			}
+			return $entries;
+		}
 	}
-
+	
+	
 	function getList($user, $type = 1, $offset = 0, $limit = 10) {
 		if (!is_numeric($type)) {
 			throw new Exception("Type is not recognized");
@@ -114,8 +145,7 @@ class MeasureService {
 		$stmt -> bindParam(':v', $value);
 		$stmt -> bindParam(':u', $user);
 		if ($stmt -> execute()) {
-			$entries = $this->getList($user,$type,0,2);
-			return $entries[0];
+			return $this->getList($user,$type,0,1);
 		}
 	}
 

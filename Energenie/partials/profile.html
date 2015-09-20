@@ -1,25 +1,17 @@
 <div layout="row">
 	<md-input-container> <label>Wachtwoord</label> <input
-		type="password" ng-model="password" /> </md-input-container>
-	<md-button ng-if="dirtypassword" ng-click="savePassword()">
+		type="password" data-ng-model="password" /> </md-input-container>
+	<md-button data-ng-if="dirtypassword" data-ng-click="savePassword()">
 	<md-icon md-font-icon="fa fa-check-circle"></md-icon> </md-button>
 </div>
-<div layout="row">
-	<md-input-container> <label>Invoer datum</label> <input
-		ng-model="preference.recorddate" /> </md-input-container>
-</div>
-
-<div layout="row">
-	<div layout="column" style="width: 20%">
-		<md-checkbox ng-true-value="'1'" ng-model="preference.notify"
-			aria-label="Notificatie" ng-click="saveNotification()">
-		Notificatie instellen </md-checkbox>
-	</div>
-	<div layout="column">
-		<div layout="row" ng-if="preference.notify">
-			<md-input-container> <label>E-mail adres</label>
-			<input type="email" ng-model="preference.email" ng-model-options="{ debounce: 250 }"/> </md-input-container>
-		</div>
-	</div>
-</div>
-
+<md-input-container layout="row">
+	<label>Invoer datum</label>
+	<input data-ng-model="preference.recorddate"></input>
+</md-input-container>
+<md-checkbox layout='row' data-ng-true-value="'1'" data-ng-model="preference.notify"	aria-label="Notificatie" data-ng-click="saveNotification()">
+Notificatie instellen
+</md-checkbox>
+<md-input-container layout="row" data-ng-if="preference.notify">
+	<label>E-mail adres</label>
+	<input type="email" data-ng-model="preference.email" data-ng-model-options="{ debounce: 250 }" /> 
+</md-input-container>

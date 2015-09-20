@@ -1,4 +1,4 @@
-var c =  angular.module('appcontrollers',['ngMessages','EnergyServices']);
+var c =  angular.module('appcontrollers',['ngMessages','EnergyServices',"ng-fusioncharts"]);
 c.controller('AuthController',['$scope','$location','authService',function($scope,$l,$auth){
 
 	if($auth.isLoggedIn()){
@@ -43,11 +43,22 @@ c.controller('AuthController',['$scope','$location','authService',function($scop
   	text: "Profiel",
   	route: "/profile",
   	icon: "fa fa-user"
+  },
+  {
+	  text: 'Grafiekjes',
+	  route: '/graph',
+	  icon: 'fa fa-bar-chart'
   }
   ];
   
  
 }]).controller('listController',['$scope','$mdSidenav','authService','$routeParams','$location','energyService',function($scope,$mdSidenav,$auth,$rp,$location,service){
+	
+	if(!$auth.isLoggedIn()){
+		$location.path('/login');
+		return;
+	}
+	
 	
 	$scope.currentPage = 0;
 	$scope.pageSize = 10;
@@ -128,7 +139,8 @@ c.controller('AuthController',['$scope','$location','authService',function($scop
 		}
 				
 		service.add(dtString,r.value).then(function(data){
-			$scope.entries = data.data.reverse();
+			$scope.entries = data.data.entries.reverse();
+			$scope.entrycount = parseInt(data.data.records);
 		},function(data){
 			console.log('kapot');
 		})
@@ -209,5 +221,109 @@ c.controller('AuthController',['$scope','$location','authService',function($scop
             }
 		}
 	});
+
+}]).controller('chartController',['$scope','authService','energyService','$location',function($scope,auth,energyService,$location){
+	
+	for(var i = 0;i < energyService.types.length;i++){
+		var t = energyService.types[i];
+		energyService.list(t,0,10,'year').then(function(data){
+			if(!$scope.hasOwnProperty('charts')){
+				$scope.charts = [];
+			}
+			
+			var chart = {
+				"chart": {
+		                "paletteColors": "#0075c2",
+		                "bgColor": "#ffffff",
+		                "showBorder": "0",
+		                "showCanvasBorder": "0",
+		                "usePlotGradientColor": "0",
+		                "plotBorderAlpha": "10",
+		                "placeValuesInside": "1",
+		                "valueFontColor": "#ffffff",
+		                "showYAxisValues": "0",
+		                "axisLineAlpha": "25",
+		                "divLineAlpha": "10",
+		                "alignCaptionWithCanvas": "0",
+		                "showAlternateVGridColor": "0",
+		                "captionFontSize": "14",
+		                "subcaptionFontSize": "14",
+		                "subcaptionFontBold": "0",
+		                "toolTipColor": "#ffffff",
+		                "toolTipBorderThickness": "0",
+		                "toolTipBgColor": "#000000",
+		                "toolTipBgAlpha": "80",
+		                "toolTipBorderRadius": "2",
+		                "toolTipPadding": "5"					
+				},
+				"data":[]
+			}
+			
+			for(var j = 0;j<data.data.length;j++){
+				chart.data.push({
+					"label": data.data[j].year,
+					"value": data.data[j].amount
+				});
+			}
+			
+			$scope.charts.push(chart);
+		},function(data){
+			console.log('grafiek error');
+		});
+		
+	}
+	
+	
+	$scope.dataSource = {
+            "chart": {
+
+                "numberPrefix": "$",
+                "paletteColors": "#0075c2",
+                "bgColor": "#ffffff",
+                "showBorder": "0",
+                "showCanvasBorder": "0",
+                "usePlotGradientColor": "0",
+                "plotBorderAlpha": "10",
+                "placeValuesInside": "1",
+                "valueFontColor": "#ffffff",
+                "showYAxisValues": "0",
+                "axisLineAlpha": "25",
+                "divLineAlpha": "10",
+                "alignCaptionWithCanvas": "0",
+                "showAlternateVGridColor": "0",
+                "captionFontSize": "14",
+                "subcaptionFontSize": "14",
+                "subcaptionFontBold": "0",
+                "toolTipColor": "#ffffff",
+                "toolTipBorderThickness": "0",
+                "toolTipBgColor": "#000000",
+                "toolTipBgAlpha": "80",
+                "toolTipBorderRadius": "2",
+                "toolTipPadding": "5"
+            },
+            
+            "data": [
+                {
+                    "label": "Bakersfield Central",
+                    "value": "880000"
+                }, 
+                {
+                    "label": "Garden Groove harbour",
+                    "value": "730000"
+                }, 
+                {
+                    "label": "Los Angeles Topanga",
+                    "value": "590000"
+                }, 
+                {
+                    "label": "Compton-Rancho Dom",
+                    "value": "520000"
+                }, 
+                {
+                    "label": "Daly City Serramonte",
+                    "value": "330000"
+                }
+            ]
+        };
 
 }]);
