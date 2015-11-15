@@ -54,9 +54,9 @@ class MeasureService {
 		}
 		
 		$list = array();
-		//$offset = $limit*10;
+		$offset = $offset*$limit;
 		
-		$stmCount = $this -> db -> getConn()->prepare("SELECT COUNT(*) as c from `measurement` where type=:t and user_id=:u");
+		$stmCount = $this -> db -> getConn()->prepare("SELECT COUNT(*) as c from `measurement` where type=:t and user_id=:u order by date desc");
 		$stmCount->bindParam(':t',$type);
 		$stmCount->bindParam(':u',$user);
 		$entryCount = $limit;
@@ -65,15 +65,12 @@ class MeasureService {
 			$row = $stmCount->fetch(PDO::FETCH_ASSOC);
 			$entryCount = $row['c'];
 		}
-		$qLimit = $limit;
-		if($entryCount > $qLimit){
-			$qLimit = $limit+1;
-		}
+		
 				
 		$stmt = $this -> db -> getConn() -> prepare("SELECT * from `measurement` where type = :t and user_id = :u order by date desc LIMIT :o , :l");
 		$stmt -> bindParam(":t", $type);
 		$stmt -> bindParam(":o", $offset, PDO::PARAM_INT);
-		$stmt -> bindParam(":l", $qLimit, PDO::PARAM_INT);
+		$stmt -> bindParam(":l", $limit, PDO::PARAM_INT);
 		$stmt -> bindParam(":u", $user);
 
 		if ($stmt -> execute()) {

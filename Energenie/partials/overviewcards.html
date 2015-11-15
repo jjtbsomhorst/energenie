@@ -16,23 +16,34 @@
 </md-card>
 
 <div layout="row">
-	<md-card flex-gt-sm="30" flex-sm="100"> <md-card-content>
-	<div layout="column">
-		<div layout="row">
-			<label class="table-header" flex="33">Datum</label> <label
-				class="table-header" flex="33">Stand</label> <label
-				class="table-header" flex="33">Verbruik</label>
-		</div>
-		<div layout="row" ng-repeat="record in entries">
-			<label flex="33">{{record.date | date:'dd-MM-yyyy'}}</label> <label
-				flex="33">{{record.amount}}</label> <label flex="33">{{record.difference}}</label>
-		</div>
-	</div>
-	</md-card-content>
-	<div class="md-actions" layout="row" layout-align="end-center">
-		<md-button ng-click="gotoNext()">Previous</md-button>
-		<md-button ng-click="gotoPrevious()">Next</md-button>
-	</div>
-	</md-card>
+	<md-card flex-gt-sm="30" flex-sm="100"> 
+		<md-card-content>
+			<table width="100%">
+			<thead class="table-header">
+				<th width="33.3%">Datum</th>
+				<th width="33.3%">Stand</th>
+				<th width="33.3%">Verbruik</th>
+			</thead>
+			<tbody>
+				<tr ng-repeat="record in entries">
+					<td>{{record.date | date:'dd-MM-yyyy'}}</td>
+					<td style="text-align: right">{{record.amount}}</td>
+					<td style="text-align: right">{{record.difference}}</td>
+				</tr>
+			</tbody>
+			</table>
+			
+		</md-card-content>
+	<md-actions" layout="row" layout-align="end-center">
+		<md-button ng-disabled="hasPrevious()" ng-click="gotoNext()">Previous</md-button>
+		<md-button ng-disabled="hasNext()" ng-click="gotoPrevious()">Next</md-button>
+	</md-actions">
+	</md-card>	
+	
+	<div fusioncharts
+       type="bar2d"
+       dataSource="{{c}}" >
+    </div>
+	
 </div>
 
