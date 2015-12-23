@@ -11,9 +11,6 @@ function($routeProvider) {
 	}).when('/profile',{
 		templateUrl : 'partials/profile.html',
 		controller: 'profileController',
-	}).when('/graph',{
-		templateUrl : 'partials/graphView.html',
-		controller: 'chartController'
 	}).otherwise({
 		templateUrl : 'partials/auth.html',
 		controller : 'AuthController'

@@ -1,4 +1,4 @@
-var c =  angular.module('appcontrollers',['ngMessages','EnergyServices',"ng-fusioncharts"]);
+var c =  angular.module('appcontrollers',['ngMessages','EnergyServices', "chart.js"]);
 c.controller('AuthController',['$scope','$location','authService',function($scope,$l,$auth){
 
 	if($auth.isLoggedIn()){
@@ -43,16 +43,11 @@ c.controller('AuthController',['$scope','$location','authService',function($scop
   	text: "Profiel",
   	route: "/profile",
   	icon: "fa fa-user"
-  },
-  {
-	  text: 'Grafiekjes',
-	  route: '/graph',
-	  icon: 'fa fa-bar-chart'
   }
   ];
   
  
-}]).controller('listController',['$scope','$mdSidenav','authService','$routeParams','$location','energyService',function($scope,$mdSidenav,$auth,$rp,$location,service){
+}]).controller('listController',['$scope','$mdSidenav','authService','$routeParams','$location','energyService','$filter',function($scope,$mdSidenav,$auth,$rp,$location,service,$filter){
 	
 	if(!$auth.isLoggedIn()){
 		$location.path('/login');
@@ -66,20 +61,15 @@ c.controller('AuthController',['$scope','$location','authService',function($scop
 	$scope.pageCount = 0;
 	$scope.disableNext = false;
 	$scope.disablePrevious = true;
-	
+	$scope.data = [];
+	$scope.labels = [];
 	$scope.$watch('currentPage',function(n,o){
 		if(n != null & !(n < 0)){
 			service.list($rp.type,$scope.currentPage,$scope.pageSize).then(function(data){
 				$scope.entries = data.data.entries.reverse();
-				$scope.entrycount = parseInt(data.data.records);
-				var mod = $scope.entrycount % $scope.pageSize;
-				$scope.pageCount = ($scope.entrycount - mod )/$scope.pageSize;
-				if(mod > 0 ){
-					$scope.pageCount++;
-				}
-				
-				
-				
+				$scope.entrycount = data.data.records;
+				var mod = $scope.entrycount / $scope.pageSize;
+				$scope.pageCount = $scope.entrycount / $scope.pageSize;				
 			},function(data){
 				console.log('kapot');
 			})
@@ -88,11 +78,11 @@ c.controller('AuthController',['$scope','$location','authService',function($scop
 	
 	
 	$scope.hasPrevious = function(){
-		return $scope.currentPage > 0;
+		return $scope.currentPage >= 0 && $scope.currentPage < $scope.pageCount-1;
 	}
 	
 	$scope.hasNext = function(){
-		return ($scope.currentPage * $scope.pageSize)+$scope.pageSize < $scope.entrycount;
+		return $scope.currentPage > 0 && $scope.currentPage < $scope.pageCount;
 	}
 	
 	$scope.gotoPrevious = function(){
@@ -117,8 +107,16 @@ c.controller('AuthController',['$scope','$location','authService',function($scop
 	}
 	
 	service.list($rp.type,$scope.currentPage,$scope.pageSize).then(function(data){
-			$scope.entries = data.data.entries.reverse();
-			$scope.entrycount = parseInt(data.data.records);
+		
+		$scope.entries = data.data.entries.reverse();
+		$scope.entrycount = parseInt(data.data.records);
+		$scope.entries.forEach(function(value,index){
+			$scope.data.push(parseInt(value.amount));
+			var month = $filter('date')(value.date,"MMMM");
+			$scope.labels.push(month);
+		});
+			
+			
 		},function(data){
 			console.log('kapot');
 		})
@@ -229,53 +227,4 @@ c.controller('AuthController',['$scope','$location','authService',function($scop
 		}
 	});
 
-}]).controller('chartController',['$scope','authService','energyService','$location',function($scope,auth,energyService,$location){
-	
-	for(var i = 0;i < energyService.types.length;i++){
-		var t = energyService.types[i];
-		energyService.list(t,0,10,'year').then(function(data){
-			if(!$scope.hasOwnProperty('charts')){
-				$scope.charts = [];
-			}
-			
-			var chart = {
-				"chart": {
-		                "paletteColors": "#0075c2",
-		                "bgColor": "#ffffff",
-		                "showBorder": "0",
-		                "showCanvasBorder": "0",
-		                "usePlotGradientColor": "0",
-		                "plotBorderAlpha": "10",
-		                "placeValuesInside": "1",
-		                "valueFontColor": "#ffffff",
-		                "showYAxisValues": "0",
-		                "axisLineAlpha": "25",
-		                "divLineAlpha": "10",
-		                "alignCaptionWithCanvas": "0",
-		                "showAlternateVGridColor": "0",
-		                "captionFontSize": "14",
-		                "subcaptionFontSize": "14",
-		                "subcaptionFontBold": "0",
-		                "toolTipColor": "#ffffff",
-		                "toolTipBorderThickness": "0",
-		                "toolTipBgColor": "#000000",
-		                "toolTipBgAlpha": "80",
-		                "toolTipBorderRadius": "2",
-		                "toolTipPadding": "5"					
-				},
-				"data":[]
-			}
-			
-			for(var j = 0;j<data.data.length;j++){
-				chart.data.push({
-					"label": data.data[j].year,
-					"value": data.data[j].amount
-				});
-			}
-			
-			$scope.charts.push(chart);
-		},function(data){
-			console.log('grafiek error');
-		});	
-	}
 }]);

@@ -5,6 +5,7 @@ var TYPE_GAS = "gas";
 var TYPES = [TYPE_ELECTRA,TYPE_GAS,TYPE_WATER];
 
 var services = angular.module('EnergyServices', [ 'ngRoute' ]);
+
 services.factory('authService', [ '$rootScope', '$http', '$location', '$q',
 		function($scope, $http, $location, $q) {
 
@@ -192,7 +193,10 @@ services.factory('energyService', [ '$http', '$q', 'authService',
 			service.remove = function(id) {
 			}
 			
-			
+			service.getCurrentList = function(){
+				var def = $q.defer();
+				return def.resolve();
+			}
 			
 			service.list = function(type,page,pagesize,groupby) {
 				this.setType(type);
@@ -208,7 +212,8 @@ services.factory('energyService', [ '$http', '$q', 'authService',
 					url : url,
 					headers : {
 						'X-AUTH-TOKEN' : auth.getToken()
-					}
+					},
+					config: {cache : true}
 				}
 				var def = $q.defer();
 

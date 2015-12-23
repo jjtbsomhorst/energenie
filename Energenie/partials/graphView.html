@@ -1,9 +1,10 @@
 
 <md-card ng-repeat="c in charts">
 	<md-card-content>
-		<div fusioncharts
-       type="bar2d"
-       dataSource="{{c}}" >
+		
+		<canvas id="bar" class="chart chart-bar" chart-data="[10,50,81,4]" chart-labels="['test','test2','test3','test4]">
+		</canvas>	
+		
     </div>
 	</md-card-content>
 	<div class="md-actions" layout="row" layout-align="end-center"></div>

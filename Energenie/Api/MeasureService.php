@@ -97,7 +97,7 @@ class MeasureService {
 			$records = array_reverse($entries);
 			$returnData = array();
 			$returnData['entries'] = $records;
-			$returnData['records'] = $entryCount;
+			$returnData['records'] = intVal($entryCount);
 		
 			return $returnData;
 		}

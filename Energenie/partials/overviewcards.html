@@ -35,15 +35,17 @@
 			
 		</md-card-content>
 	<md-actions" layout="row" layout-align="end-center">
-		<md-button ng-disabled="hasPrevious()" ng-click="gotoNext()">Previous</md-button>
-		<md-button ng-disabled="hasNext()" ng-click="gotoPrevious()">Next</md-button>
+		<md-button ng-disabled="!hasPrevious()" ng-click="gotoNext()">Vorige</md-button>
+		<md-button ng-disabled="!hasNext()" ng-click="gotoPrevious()">Volgende</md-button>
 	</md-actions">
 	</md-card>	
 	
-	<div fusioncharts
-       type="bar2d"
-       dataSource="{{c}}" >
-    </div>
-	
+	 <canvas id="line" class="chart chart-line" chart-data="data" chart-labels="labels" chart-legend="true"></canvas> 
+	<md-card>
+		<md-card-content>
+		
+		</canvas>	
+		</md-card-content>
+	</md-card>
 </div>
 
